@@ -20,9 +20,9 @@ func SerialInit(serialConfig SerialPortConfig) (io.ReadWriteCloser, error) {
 }
 
 func SerialWrite(serialObject io.ReadWriteCloser, openClose string) error {
-    // openClose
-    //     "OC0": open command
-    //     "OC1": close command
+	// openClose
+	//     "OC0": open command
+	//     "OC1": close command
 	_, err := serialObject.Write([]byte(openClose))
 	if err != nil {
 		return err

@@ -39,21 +39,21 @@ type TwitterConfig struct {
 	AccessTokenSecret string `toml:"access_token_secret"`
 }
 
-func uuid() string {
+func UuidGenerate() (string, error) {
 	uuidgen, err := exec.Command("uuidgen").Output()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(uuidgen[:len(uuidgen)-1])
+	return string(uuidgen[:len(uuidgen)-1]), nil
 }
 
-func randomNum(i int64) string {
+func RandomNum(i int64) string {
 	// 0 - 65535
 	rand.Seed(time.Now().Unix() * i)
 	return strconv.Itoa(rand.Intn(math.MaxUint16))
 }
 
-func scan() string {
+func ScanInput() string {
 	sc := bufio.NewScanner(os.Stdin)
 	sc.Scan()
 	input := sc.Text()
@@ -61,11 +61,11 @@ func scan() string {
 }
 
 // get config file path
-func getConfigPath() (string, error) {
+func GetConfigPath() (string, error) {
 	// check the home directory
-	homeDir := ""
+	var homeDir string
 	switch runtime.GOOS {
-	case "darwin", "linux":
+	case "linux":
 		homeDir = os.Getenv("HOME")
 	default:
 		return "", errors.New("don't support this platform")
@@ -86,29 +86,34 @@ func getConfigPath() (string, error) {
 }
 
 // set config data
-func setConfig() error {
+func SetConfig() error {
 	var config SLHConfig
 
 	var serialportConfig SerialPortConfig
 	fmt.Printf("Input the serial port: ")
-	serialportConfig.Serial = scan()
+	serialportConfig.Serial = ScanInput()
 
 	var bluetoothConfig BluetoothConfig
-	bluetoothConfig.Uuid = uuid()
-	bluetoothConfig.Major = randomNum(1)
-	bluetoothConfig.Minor = randomNum(2)
+	uuid, err := UuidGenerate()
+	if err != nil {
+		// failed to generate a uuid
+		return err
+	}
+	bluetoothConfig.Uuid = uuid
+	bluetoothConfig.Major = RandomNum(1)
+	bluetoothConfig.Minor = RandomNum(2)
 
 	var twitterConfig TwitterConfig
 	fmt.Printf("Input the twitter account: ")
-	twitterConfig.Account = scan()
+	twitterConfig.Account = ScanInput()
 	fmt.Printf("Input the twitter consumer-key: ")
-	twitterConfig.ConsumerKey = scan()
+	twitterConfig.ConsumerKey = ScanInput()
 	fmt.Printf("Input the twitter consumer-secret: ")
-	twitterConfig.ConsumerSecret = scan()
+	twitterConfig.ConsumerSecret = ScanInput()
 	fmt.Printf("Input the twitter access-token: ")
-	twitterConfig.AccessToken = scan()
+	twitterConfig.AccessToken = ScanInput()
 	fmt.Printf("Input the twitter access-token-secret: ")
-	twitterConfig.AccessTokenSecret = scan()
+	twitterConfig.AccessTokenSecret = ScanInput()
 
 	config.SerialPort = serialportConfig
 	config.Bluetooth = bluetoothConfig
@@ -121,7 +126,7 @@ func setConfig() error {
 	}
 
 	// create the config file
-	if file, err := getConfigPath(); err != nil {
+	if file, err := GetConfigPath(); err != nil {
 		return err
 	} else {
 		ioutil.WriteFile(file, []byte(buffer.String()), 0755)
@@ -133,10 +138,10 @@ func setConfig() error {
 }
 
 // get config data
-func getConfig() (SLHConfig, error) {
+func GetConfig() (SLHConfig, error) {
 	var config SLHConfig
 
-	if file, err := getConfigPath(); err != nil {
+	if file, err := GetConfigPath(); err != nil {
 		return config, err
 	} else {
 		if _, err := toml.DecodeFile(file, &config); err != nil {

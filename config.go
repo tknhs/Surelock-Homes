@@ -32,6 +32,7 @@ type BluetoothConfig struct {
 	Minor string `toml:"minor"`
 }
 type TwitterConfig struct {
+	Account           string `toml:"account"`
 	ConsumerKey       string `toml:"consumer_key"`
 	ConsumerSecret    string `toml:"consumer_secret"`
 	AccessToken       string `toml:"access_token"`
@@ -98,6 +99,8 @@ func setConfig() error {
 	bluetoothConfig.Minor = randomNum(2)
 
 	var twitterConfig TwitterConfig
+	fmt.Printf("Input the twitter account: ")
+	twitterConfig.Account = scan()
 	fmt.Printf("Input the twitter consumer-key: ")
 	twitterConfig.ConsumerKey = scan()
 	fmt.Printf("Input the twitter consumer-secret: ")

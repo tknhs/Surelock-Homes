@@ -1,25 +1,25 @@
 package main
 
 import (
-    "log"
-    "bufio"
+	"bufio"
+	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
-    "encoding/json"
-    //"fmt"
+	//"fmt"
 
 	"github.com/garyburd/go-oauth/oauth"
 )
 
 type Tweet struct {
-	Text       string
-    TimeStamp  string `json:"timestamp_ms"`
-	User       struct {
-		ScreenName      string `json:"screen_name"`
+	Text      string
+	TimeStamp string `json:"timestamp_ms"`
+	User      struct {
+		ScreenName string `json:"screen_name"`
 	}
 }
 
@@ -58,17 +58,17 @@ func TwitterPost(token *oauth.Credentials, twText string) error {
 
 func TwitterStreaming(twitterTimestamp chan string, token *oauth.Credentials, account string) {
 	twUrl := "https://userstream.twitter.com/1.1/user.json"
-    twParam := make(url.Values)
+	twParam := make(url.Values)
 
 	oauthClient.SignParam(token, "GET", twUrl, twParam)
-    twUrl = twUrl + "?" + twParam.Encode()
+	twUrl = twUrl + "?" + twParam.Encode()
 	res, err := http.Get(twUrl)
 	if err != nil {
-        log.Fatalf("failed to get a tweet\n", err)
+		log.Fatalf("failed to get a tweet\n", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-        log.Fatalf("failed to get a tweet\n", res.StatusCode)
+		log.Fatalf("failed to get a tweet\n", res.StatusCode)
 	}
 
 	buf := bufio.NewReader(res.Body)
@@ -86,11 +86,11 @@ func TwitterStreaming(twitterTimestamp chan string, token *oauth.Credentials, ac
 		for i := len(tweets) - 1; i >= 0; i-- {
 			user := tweets[i].User.ScreenName
 			//text := tweets[i].Text
-            ts   := tweets[i].TimeStamp
-            if user == account {
-                //fmt.Println(user + ": " + text + ": " + ts)
-                twitterTimestamp <- ts
-            }
+			ts := tweets[i].TimeStamp
+			if user == account {
+				//fmt.Println(user + ": " + text + ": " + ts)
+				twitterTimestamp <- ts
+			}
 		}
 	}
 }

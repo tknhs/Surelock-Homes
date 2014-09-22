@@ -65,7 +65,7 @@ func GetConfigPath() (string, error) {
 	// check the home directory
 	var homeDir string
 	switch runtime.GOOS {
-	case "linux":
+	case "darwin", "linux":
 		homeDir = os.Getenv("HOME")
 	default:
 		return "", errors.New("don't support this platform")

@@ -33,11 +33,10 @@ func doStart(c *cli.Context) {
 		log.Fatalf("failed to open the serial port\n", err)
 	}
 
-	log.Println("start TwitterPosting and BeaconScanning...")
+	log.Println("start TwitterStreaming and BeaconScanning...")
 
 	for {
 		timestamp := make(chan string)
-		//twitterTimestamp := make(chan float64)
 		go TwitterStreaming(timestamp, token, config.Twitter.Account)
 		go BeaconScan(timestamp, config.Bluetooth)
 

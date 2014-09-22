@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	//"fmt"
 
 	"github.com/garyburd/go-oauth/oauth"
 )
@@ -41,7 +40,7 @@ func TwitterPost(token *oauth.Credentials, twText string) error {
 	twUrl := "https://api.twitter.com/1.1/statuses/update.json"
 	twStatus := []string{twText, strconv.Itoa(int(time.Now().Unix()))}
 	twParam := make(url.Values)
-	twParam.Set("status", strings.Join(twStatus, ","))
+	twParam.Set("status", strings.Join(twStatus, " : "))
 
 	oauthClient.SignParam(token, "POST", twUrl, twParam)
 	res, err := http.PostForm(twUrl, url.Values(twParam))
@@ -85,10 +84,12 @@ func TwitterStreaming(twitterTimestamp chan string, token *oauth.Credentials, ac
 
 		for i := len(tweets) - 1; i >= 0; i-- {
 			user := tweets[i].User.ScreenName
-			//text := tweets[i].Text
 			ts := tweets[i].TimeStamp
+			if err != nil {
+				continue
+			}
+
 			if user == account {
-				//fmt.Println(user + ": " + text + ": " + ts)
 				twitterTimestamp <- ts
 			}
 		}

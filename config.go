@@ -27,9 +27,10 @@ type SerialPortConfig struct {
 	Serial string `toml:"serial"`
 }
 type BluetoothConfig struct {
-	Uuid  string `toml:"uuid"`
-	Major string `toml:"major"`
-	Minor string `toml:"minor"`
+	FilePath string `toml:"file_path"`
+	Uuid     string `toml:"uuid"`
+	Major    string `toml:"major"`
+	Minor    string `toml:"minor"`
 }
 type TwitterConfig struct {
 	ClientAccount     string `toml:"client_account"`
@@ -100,6 +101,8 @@ func SetConfig() error {
 		// failed to generate a uuid
 		return err
 	}
+	fmt.Printf("Input the beacon receiver file path: ")
+	bluetoothConfig.FilePath = ScanInput()
 	bluetoothConfig.Uuid = uuid
 	bluetoothConfig.Major = RandomNum(1)
 	bluetoothConfig.Minor = RandomNum(2)

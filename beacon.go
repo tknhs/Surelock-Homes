@@ -20,7 +20,8 @@ func BeaconScan(beaconTimestamp chan string, beaconConfig BluetoothConfig) {
 	// start scan
 	isBeacon := true
 	for isBeacon {
-		beaconInfo, err := exec.Command("node", "path/to/reciever.js").Output()
+		beaconInfo, err := exec.Command("node", beaconConfig.FilePath).Output()
+		beaconConfig.FilePath = ""
 		if err != nil {
 			log.Fatal(err)
 		}

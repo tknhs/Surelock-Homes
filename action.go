@@ -46,6 +46,19 @@ func doStart(c *cli.Context) {
 		ts1 := <-timestamp
 		ts2 := <-timestamp
 
+		// send a close command
+		err = SerialWrite(serialObject, "OC1")
+		if err != nil {
+			log.Fatalf("failed to write\n", err)
+		}
+
+		// twitter post
+		message := "[from Surelock-Homes] The door has closed."
+		err = TwitterPost(token, message)
+		if err != nil {
+			log.Fatalf("failed to post a tweet\n", err)
+		}
+
 		// door doesn't open when the difference exceeds the 5 minutes
 		timediff := TimeDiff(ts1, ts2)
 		if timediff >= 300 || timediff < 0 {
@@ -59,7 +72,7 @@ func doStart(c *cli.Context) {
 		}
 
 		// twitter post
-		message := strings.Join([]string{"@", config.Twitter.ClientAccount, " [from Surelock-Homes] The door has opened."}, "")
+		message = strings.Join([]string{"@", config.Twitter.ClientAccount, " [from Surelock-Homes] The door has opened."}, "")
 		err = TwitterPost(token, message)
 		if err != nil {
 			log.Fatalf("failed to post a tweet\n", err)

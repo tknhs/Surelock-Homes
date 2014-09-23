@@ -9,8 +9,16 @@ import (
 )
 
 func BeaconScan(beaconTimestamp chan string, beaconConfig BluetoothConfig) {
-	isBeacon := true
+	// Kill this function after 5 minutes
+	timer := time.NewTimer(time.Second * 300)
+	go func() {
+		<-timer.C
+		log.Println("[kill] scanning beacon")
+		beaconTimestamp <- "9000000000"
+	}()
 
+	// start scan
+	isBeacon := true
 	for isBeacon {
 		beaconInfo, err := exec.Command("node", "path/to/reciever.js").Output()
 		if err != nil {
@@ -28,6 +36,7 @@ func BeaconScan(beaconTimestamp chan string, beaconConfig BluetoothConfig) {
 		}
 	}
 
+	timer.Stop()
 	t := time.Now().Unix()
 	beaconTimestamp <- strconv.Itoa(int(t))
 }
